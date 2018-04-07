@@ -17,11 +17,10 @@ public class BuildSymbolTableVistor extends GJDepthFirst<MType,MType>{
         if(argu instanceof MVar && argu.isClassType()){
             argu.setType(n.f0.tokenImage);
         }
-        if(argu.getType().equals("returntype")){
+        if(argu.isReturnClass()){
             argu.setType(n.f0.tokenImage);
-            argu.trueReturnFlag();
         }
-        n.f0.accept(this,argu);
+//        n.f0.accept(this,argu);
         return _ret;
     }
 
@@ -99,7 +98,8 @@ public class BuildSymbolTableVistor extends GJDepthFirst<MType,MType>{
         MType _ret = null;
 
         MClass newClass = new MClass(n.f1.f0.tokenImage,argu,
-                n.f1.f0.beginLine,n.f1.f0.beginColumn,n.f3.f0.tokenImage);
+                n.f1.f0.beginLine,n.f1.f0.beginColumn,
+                n.f3.f0.tokenImage);
 
         n.f0.accept(this, newClass);
         n.f1.accept(this, newClass);
@@ -123,9 +123,12 @@ public class BuildSymbolTableVistor extends GJDepthFirst<MType,MType>{
                 n.f1.f0.beginLine, n.f1.f0.beginColumn,
                 n.f0.f0.which,
                 argu.getMethodName(), argu.getClassName());
-
+        //apply the MVar to the 'type' to get the real type of
+        //this identifier
         n.f0.accept(this, var);
+
         argu.insertVariable(var.getName(),var);
+
         if(argu instanceof MClass ){
             var.setKind(MType.FIELD);
         }
@@ -151,7 +154,7 @@ public class BuildSymbolTableVistor extends GJDepthFirst<MType,MType>{
         n.f1.accept(this,type);
 
         MMethod method;
-        if(type.getReturnFlag()){
+        if(type.isReturnClass()){
             method = new MMethod(n.f2.f0.tokenImage,type.getType(),
                     argu, n.f2.f0.beginLine,n.f2.f0.beginColumn);
         }
@@ -183,21 +186,20 @@ public class BuildSymbolTableVistor extends GJDepthFirst<MType,MType>{
     public MType visit(FormalParameter n, MType argu) {
         MType _ret = null;
 
-        MType type;
-        type = new MType(n.f0.f0.which);
+        MVar var = new MVar(n.f1.f0.tokenImage,argu,
+                n.f1.f0.beginLine, n.f1.f0.beginColumn,
+                n.f0.f0.which,
+                argu.getMethodName(), argu.getClassName());
+        //apply the MVar to the 'type' to get the real type of
+        //this identifier
+        n.f0.accept(this, var);
 
-        n.f0.accept(this,type);
-
-        MVar param = new MVar(n.f1.f0.tokenImage,argu,
-                n.f1.f0.beginLine,n.f1.f0.beginColumn,
-                type.getType(),argu.getMethodName(),argu.getClassName());
-
-
-        argu.addParm(param);
+//        System.out.println("formal parameter visitor");
+        argu.addParam(var);
 
         n.f1.accept(this,argu);
 
-        _ret = param;
+        _ret = var;
         return _ret;
     }
 }

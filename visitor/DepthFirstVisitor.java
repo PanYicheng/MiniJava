@@ -145,6 +145,7 @@ public class DepthFirstVisitor implements Visitor {
     * f2 -> ";"
     */
    public void visit(VarDeclaration n) {
+//    print all variables declared
       System.out.println(n.f1.f0.tokenImage);
       n.f0.accept(this);
       n.f1.accept(this);

@@ -1,34 +1,22 @@
 package symbol;
 
 public class MIdentifier extends MType{
-    protected String name;
-    protected String type;
-    protected int row;
-    protected int col;
-    protected MIdentifier parent;
+
+
 
     public MIdentifier(){
-        name = "";
-        type = "";
-        row = -1;
-        col = -1;
-        parent = null;
+        setType("identifier");
+        setName("");
+        setRow(-1);
+        setCol(-1);
+        setParent(null);
     }
 
-    public MIdentifier(String _name,String _type,int _row,int _col){
-        name = _name;
-        type = _type;
-        row = _row;
-        col = _col;
+    public MIdentifier(String _name,String _type,int _row,int _col,MType _parent){
+        setType(_type);
+        setName(_name);
+        setRow(_row);
+        setCol(_col);
+        setParent(_parent);
     }
-
-    public void setParent(MIdentifier _parent){
-        parent = _parent;
-    }
-
-    public String getName(){return name;};
-    public String getParentName(){return parent.getName();};
-    public String getType(){return type;};
-
-
 }

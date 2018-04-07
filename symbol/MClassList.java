@@ -1,16 +1,27 @@
 package symbol;
 
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Vector;
+import errorinfo.*;
+
+import javax.swing.text.html.HTMLDocument;
 
 public class MClassList  extends MType{
     protected String mainClassName;
     protected HashMap<String,MClass> classList;
 
+    public MClassList(){
+        setType("Classlist");
+        mainClassName = "";
+        classList = new HashMap<>();
+    }
+
+
     public MClassList(String _mainClassName){
+        setType("Classlist");
         mainClassName = _mainClassName;
-        classList = new HashMap<String,MClass>();
-//        global symbol = this;
+        classList = new HashMap<>();
     }
 
     public boolean setMainClassName(String _mainClassName){
@@ -27,17 +38,26 @@ public class MClassList  extends MType{
 
     public boolean insertClass (String className, MClass classObj) {
         if (classList.containsKey(className)) {
-//            ErrorInfo.addlnInfo("Exception in thread \"main\" typecheck.MutipleDeclarationException:");
-//            ErrorInfo.addlnInfo("\tEncountered \"class "+className+"\" at line"+classObj.lineNumber);
-//            TypeCheck.setError();
-            System.out.println("Class:"+className+"has been multideclared!");
+            ErrorInfo.addInfo(classObj.getRow(),classObj.getRow(),
+                    "multi declaration of class");
             return false;
         }
         classList.put(className, classObj);
         return true;
     }
 
-    public MClass getMClass(String className){
+    public void printAllClass(){
+        System.out.printf("\n\nAll Classes:\n\n");
+        for(Map.Entry<String,MClass>entry:classList.entrySet()){
+            System.out.println("###########################");
+            System.out.println(" "+entry.getKey()+" extend "
+                    +entry.getValue().getParentClassName());
+            entry.getValue().printAllVars(3);
+            entry.getValue().printAllMethods(3);
+        }
+    }
+
+    public MClass getMClassObj(String className){
         return classList.get(className);
     }
 

@@ -6,7 +6,7 @@ import java.util.Vector;
 public class MiniJavaParser implements MiniJavaParserConstants {
 
   static final public Goal Goal() throws ParseException {
-      System.out.println("Goal");
+//      System.out.println("Goal");
    MainClass n0;
    NodeListOptional n1 = new NodeListOptional();
    TypeDeclaration n2;

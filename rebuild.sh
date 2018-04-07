@@ -1,2 +1,2 @@
-rf -rf */*.class *.class
+rm -rf */*.class *.class
 javac *.java
