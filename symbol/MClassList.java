@@ -1,5 +1,6 @@
 package symbol;
 
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Vector;
@@ -61,49 +62,49 @@ public class MClassList  extends MType{
         return classList.get(className);
     }
 
-    public boolean hasInheritanceLoop() {
-        HashMap<String, Integer> checkedClasses = new HashMap<String, Integer>();
-        Vector<String> inheritanceClass = new Vector<String>();
+    public boolean checkInheritanceLoop() {
+        HashMap<String, Integer> checkedClasses = new HashMap<>();
+        Vector<String> inheritanceClass = new Vector<>();
         Integer now = 1;
         for (MClass myclass: classList.values()) {
             if (checkedClasses.containsKey(myclass.getName())) continue;
             MClass tmp = myclass;
             inheritanceClass.clear();
-            while (classList.containsKey(tmp.getParentName())) {
-//                inheritanceClass.add(tmp.getName());
-                if (checkedClasses.containsKey(tmp.getName()) && checkedClasses.get(tmp.getName()).equals(now)) {
-//                    ErrorInfo.addlnInfo("Exception in thread \"main\" minijava.typecheck.InheritanceLoopException:");
-//                    ErrorInfo.addInfo("\tEncountered Inheritance Loop \"class "+classTable.className);
-                    System.out.println("Exists Inheritance Loop");
+            while (classList.containsKey(tmp.getParentClassName())) {
+                inheritanceClass.add(tmp.getName());
+                if (checkedClasses.containsKey(tmp.getName()) &&
+                        checkedClasses.get(tmp.getName()).equals(now)) {
+                    ErrorInfo.addInfo(myclass.getRow(),myclass.getCol(),
+                            "inheritance loop class:"+myclass.getName());
+                    System.out.printf("       Extends class:");
                     for (int i = 0; i < inheritanceClass.size(); i++) {
-                        System.out.println(inheritanceClass.get(i));
+                        System.out.printf(inheritanceClass.get(i)+" ");
                     }
-//                        ErrorInfo.addInfo(" extends class "+inheritanceClass.get(i));
-//                    ErrorInfo.addlnInfo("\" at line"+classTable.lineNumber);
-//                    TypeCheck.setError();
+                    System.out.println("");
                     return true;
                 }
                 checkedClasses.put(tmp.getName(), now);
-                tmp = classList.get(tmp.getParentName());
+                tmp = classList.get(tmp.getParentClassName());
             }
             now++;
         }
         return false;
     }
 
-    public boolean hasUndefinedClass() {
+    public boolean checkUndefinedClass() {
         boolean flag = false;
         for (MClass myclass: classList.values()) {
             if (myclass.getName().equals(mainClassName)) continue;
-            if (myclass.hasUndefinedClass()) flag = true;
+            if (myclass.checkUndefinedClass(this)) flag = true;
         }
         return flag;
     }
 
-    public boolean hasOverrideError() {
+    public boolean checkOverrideError() {
         boolean flag = false;
         for (MClass myclass: classList.values()) {
-            if (myclass.hasOverrideError()) flag = true;
+            if (myclass.checkOverrideError(this))
+                flag = true;
         }
         return flag;
     }

@@ -8,10 +8,10 @@ package errorinfo;
 import java.util.ArrayList;
 
 public class ErrorInfo {
-    public static final ArrayList<Integer> rows = new ArrayList<Integer>();
-    public static final ArrayList<Integer> cols = new ArrayList<Integer>();
-    public static final ArrayList<String> msgs = new ArrayList<String>();
-    public static int size = 0;
+    private static final ArrayList<Integer> rows = new ArrayList<>();
+    private static final ArrayList<Integer> cols = new ArrayList<>();
+    private static final ArrayList<String> msgs = new ArrayList<>();
+    private static int size = 0;
     public ErrorInfo(){
     }
 
@@ -23,8 +23,8 @@ public class ErrorInfo {
         for(Integer i=0;i<size;i++)
             System.out.println("[" + i.toString() + "] " +
                     " " + msgs.get(i) +
-                    " row: " + rows.get(i).toString() +
-                    " col: " + cols.get(i).toString());
+                    " row:" + rows.get(i).toString() +
+                    " col:" + cols.get(i).toString());
     }
 
     public static void addInfo(int row,int col,String msg) {

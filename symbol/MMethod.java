@@ -84,4 +84,57 @@ public class MMethod extends MIdentifier{
                 value.getName()));
         System.out.printf("\n");
     }
+
+    public String getMethodName(){
+        return getName();
+    }
+
+    public boolean checkUndefinedClass(MClassList classlist){
+        boolean flag = false;
+        if(!returnType.equals("int[]") &&
+                !returnType.equals("boolean") &&
+                !returnType.equals("int") &&
+                (classlist.getMClassObj(returnType) == null)){
+            ErrorInfo.addInfo(getRow(),getCol(),
+                    "return type not defined");
+            flag = true;
+        }
+        for(MVar var:varList.values()){
+            if(var.isClassType() &&
+                    (classlist.getMClassObj(var.getType()) == null))
+            {
+                ErrorInfo.addInfo(var.getRow(),var.getCol(),
+                        "local variable type not defined:["+var.getType()+
+            "]");
+                flag = true;
+            }
+        }
+        for(int i=0;i<paramList.size();i++){
+            MVar var = paramList.get(i);
+            if(var.isClassType() &&
+                    (classlist.getMClassObj(var.getType()) == null))
+            {
+                ErrorInfo.addInfo(var.getRow(),var.getCol(),
+                        "local variable type not defined:["+var.getType()+
+                "]");
+                flag = true;
+            }
+        }
+        return flag;
+    }
+
+    public boolean canOverride(MMethod superMethod){
+        if(!returnType.equals(superMethod.getReturnTypeName()))
+            return false;
+        if(paramList.size() != superMethod.paramList.size()){
+            return false;
+        }
+        for(int i=0;i<paramList.size();i++){
+            if(!paramList.get(i).getType().equals(
+                    superMethod.paramList.get(i).getType())){
+                return false;
+            }
+        }
+        return true;
+    }
 }

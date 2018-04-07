@@ -11,18 +11,35 @@ import errorinfo.ErrorInfo;
 
 
 public class Main{
+
+
 	public static void main(String args[]){
         try{
 //            InputStream in = new FileInputStream(args[0]);
             InputStream in = new FileInputStream(
-                    "./program/TreeVisitor-error.java");
+                    "./program/10.java");
             Node root = new MiniJavaParser(in).Goal();
             MType allClassList = null;
-            System.out.println("---start building symbol table");
+            System.out.println("---0.start building symbol table");
             allClassList = root.accept(new BuildSymbolTableVistor(),
                     allClassList);
             System.out.println("---print all classes");
             allClassList.printAllClass();
+
+            System.out.printf("\n\n");
+            System.out.println("---1.check inheritance loop,undefined class," +
+                    "override error");
+            if(firstCheck((MClassList) allClassList)){
+                System.out.println("     Exist Inheritance loop," +
+                        "Undefined class,Override error");
+            }
+            System.out.println("---1.end");
+
+            System.out.println("---2.second time type check");
+
+
+
+
 //            root.accept(new TypeCheckVisitor(),allClassList);
             if(ErrorInfo.getSize() == 0){
                 System.out.println("Program type checked successfully");
@@ -30,6 +47,7 @@ public class Main{
             else{
                 System.out.println("Type error");
             }
+            System.out.println("---Print All Error Info:");
             ErrorInfo.printAll();
         }
         catch(FileNotFoundException e1){
@@ -39,5 +57,17 @@ public class Main{
             e2.printStackTrace();
         }
 	}
+
+    private static boolean firstCheck(MClassList classlist){
+        if(classlist == null)
+            return true;
+        if(classlist.checkInheritanceLoop())
+            return true;
+        if(classlist.checkUndefinedClass())
+            return true;
+        if(classlist.checkOverrideError())
+            return true;
+        return false;
+    }
 }
 

@@ -18,7 +18,8 @@ public class MClass extends MIdentifier{
 
     public boolean insertMethod(String methodName,MMethod method){
         if(methods.containsKey(methodName)){
-            ErrorInfo.addInfo(method.getRow(),method.getCol(),"multi declaration");
+            ErrorInfo.addInfo(method.getRow(),method.getCol(),"multi declaration of method" +
+                    "of the same name : [" + methodName+"]");
             return false;
         }
         methods.put(methodName,method);
@@ -63,12 +64,51 @@ public class MClass extends MIdentifier{
         }
     }
 
-    public boolean hasUndefinedClass(){
-        return false;
+    public boolean checkUndefinedClass(MClassList classlist){
+        boolean flag = false;
+        if( classlist.getMClassObj(extendClassName) == null &&
+                !extendClassName.equals("none")){
+             ErrorInfo.addInfo(getRow(),getCol(),
+                     "extended class not existed");
+             flag = true;
+        }
+        for(MVar internalvariable:internalVars.values()){
+            if(internalvariable.isClassType() &&
+                    classlist.getMClassObj(internalvariable.getType()) == null){
+                ErrorInfo.addInfo(internalvariable.getRow(),
+                        internalvariable.getCol(),
+                        "internal class variable not exists");
+                flag = true;
+            }
+        }
+        for(MMethod method:methods.values()){
+            if(method.getMethodName().equals("main"))
+                continue;
+            if(method.checkUndefinedClass(classlist))
+                flag = true;
+        }
+        return flag;
     }
 
-    public boolean hasOverrideError(){
-        return false;
+    public boolean checkOverrideError(MClassList classlist){
+        boolean flag = false;
+        for(MMethod method:methods.values()){
+            MClass parentClass = classlist.getMClassObj(getParentClassName());
+            while(parentClass != null){
+                if(parentClass.methods.containsKey(method.getMethodName())){
+                    MMethod superMethod = parentClass.methods.get(method.getMethodName());
+                    if(!method.canOverride(superMethod)){
+                        ErrorInfo.addInfo(method.getRow(),method.getCol(),
+                                "method:["+getName()+"."
+                                        +method.getMethodName()+
+                        "] override error");
+                        flag = true;
+                    }
+                }
+                parentClass = classlist.getMClassObj(parentClass.getParentClassName());
+            }
+        }
+        return flag;
     }
 
     public boolean hasUnusedVariables(){
