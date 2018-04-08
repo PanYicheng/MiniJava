@@ -57,6 +57,8 @@ public class MVar extends MIdentifier{
     }
 
     public void setInited(int _inited){
+        System.out.println("Change Inited Status of Variables "+getName()
+                +" "+String.valueOf(_inited));
         inited = _inited;
     }
 

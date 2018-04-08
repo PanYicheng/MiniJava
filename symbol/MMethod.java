@@ -133,6 +133,15 @@ public class MMethod extends MIdentifier{
         return getParent().getParent();
     }
 
+    public boolean isParameterByName(String varName){
+        for(int i=0;i<paramList.size();i++){
+            if(paramList.get(i).getName().equals(varName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isParamListCompatible(ParamType params){
         if(params.getLength() != paramList.size())
             return false;

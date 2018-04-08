@@ -62,6 +62,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
 
     @Override
     public String visit(MethodDeclaration n, MType argu) {
+        String _ret;
         MMethod method = argu.getMethodByName(n.f2.f0.tokenImage);
 
         n.f0.accept(this, method);
@@ -80,7 +81,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 n.f11.beginLine,n.f11.beginColumn,
                 "UnknownType",method.getName(),
                 method.getClassName());
-        n.f10.accept(this, retVar);
+        _ret = n.f10.accept(this, retVar);
         // return type error
         if (!method.getReturnTypeName().equals(retVar.getType())) {
             ErrorInfo.addInfo(n.f9.beginColumn,n.f9.beginColumn,
@@ -91,7 +92,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         n.f11.accept(this, method);
         n.f12.accept(this, method);
 
-        return null;
+        return _ret;
     }
 
     @Override
@@ -109,7 +110,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
             ErrorInfo.addInfo(n.f0.f0.beginColumn,n.f0.f0.beginColumn,
                     "identifier:["+n.f0.f0.tokenImage+"]"
             +"of "+argu.getParent().getName()+"."+argu.getMethodName()+
-            "not declared");
+            " not declared");
         } else {
             if (id.getInited()) inited = true;
             else id.setInited(MVar.INITED);
@@ -165,7 +166,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
             id.getName()+"]");
         }
 
-        MVar typeVar= new MVar("UnknowExp",
+        MVar typeVar= new MVar("UnknowIdentifier",
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
@@ -237,7 +238,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar);
+        String exp = n.f2.accept(this, typeVar);
 
         /**
          * if (exp)'s exp is not 'boolean'
@@ -253,6 +254,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         n.f5.accept(this, argu);
         n.f6.accept(this, argu);
 
+        _ret ="if("+exp+")...";
         return _ret;
     }
     @Override
@@ -266,7 +268,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar);
+        String exp = n.f2.accept(this, typeVar);
 
         /**
          * while (exp)'s exp is not 'boolean'
@@ -279,7 +281,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
 
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
-
+        _ret = "while("+exp+")...";
         return _ret;
     }
     @Override
@@ -293,7 +295,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar);
+        _ret = n.f2.accept(this, typeVar);
 
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
@@ -304,7 +306,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         if (!typeVar.getType().equals("UnknownType"))
             if (!typeVar.getType().equals("int")) {
                 ErrorInfo.addInfo(typeVar.getRow(),typeVar.getCol(),
-                        "print(exp) exp is not int");
+                        "print(exp) 's exp is not int");
             }
 
         return _ret;
@@ -317,7 +319,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f0.accept(this, typeVar1);
+        String str1 = n.f0.accept(this, typeVar1);
 
         n.f1.accept(this, argu);
 
@@ -325,7 +327,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar2);
+        String str2 = n.f2.accept(this, typeVar2);
 
         /**
          * exp1 is not 'boolean'
@@ -348,7 +350,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         if (typeVar1.getType().equals("boolean") &&
                 typeVar2.getType().equals("boolean"))
             argu.setType("boolean");
-
+        _ret = str1+"&&"+str2;
         return _ret;
     }
     @Override
@@ -359,7 +361,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f0.accept(this, typeVar1);
+        String str1 = n.f0.accept(this, typeVar1);
 
         n.f1.accept(this, argu);
 
@@ -367,7 +369,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar2);
+        String str2 = n.f2.accept(this, typeVar2);
 
         /**
          * exp1 is not 'int'
@@ -390,7 +392,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         if (typeVar1.getType().equals("int")
                 && typeVar2.getType().equals("int"))
             argu.setType("boolean");
-
+        _ret = str1+"<"+str2;
         return _ret;
     }
     @Override
@@ -439,41 +441,33 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
     @Override
     public String visit(MinusExpression n, MType argu) {
         String _ret = null;
-
         MVar typeVar1= new MVar("UnknowExp",
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f0.accept(this, typeVar1);
-
+        String str1 = n.f0.accept(this, typeVar1);
         n.f1.accept(this, argu);
-
         MVar typeVar2= new MVar("UnknowExp",
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar2);
-        /**
-         * exp1 is not 'int'
-         */
+        String str2 = n.f2.accept(this, typeVar2);
+        //  exp1 is not 'int'
         if (!typeVar1.getType().equals("UnknownType"))
             if (!typeVar1.getType().equals("int")) {
                 ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
                         "exp1 - exp2 : exp1 is not int");
             }
-
-        /**
-         * exp2 is not 'int'
-         */
+        //  exp2 is not 'int'
         if (!typeVar2.getType().equals("UnknownType"))
             if (!typeVar2.getType().equals("int")) {
                 ErrorInfo.addInfo(typeVar2.getRow(),typeVar2.getCol(),
                         "exp1 - exp2 : exp2 is not int");
             }
-
         if (typeVar1.getType().equals("int")
                 && typeVar2.getType().equals("int"))
             argu.setType("int");
+        _ret = str1+"-"+str2;
         return _ret;
     }
     @Override
@@ -516,58 +510,55 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
             argu.setType("int");
         return _ret;
     }
+
     @Override
     public String visit(ArrayLookup n, MType argu) {
         String _ret = null;
 
-        MVar typeVar1= new MVar("UnknowExp",
+        MVar typeVar1= new MVar("UnknowPrimaryExp",
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f0.accept(this, typeVar1);
+        String list = n.f0.accept(this, typeVar1);
 
         n.f1.accept(this, argu);
 
-        MVar typeVar2= new MVar("UnknowExp",
+        MVar typeVar2= new MVar("UnknowPrimaryExp",
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar2);
-
+        String index = n.f2.accept(this, typeVar2);
         n.f3.accept(this, argu);
-
-        /**
-         * array is not 'int[]'
-         */
+        //  array is not 'int[]'
         if (!typeVar1.getType().equals("UnknownType"))
             if (!typeVar1.getType().equals("int[]")) {
                 ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
                         "exp1[exp2] : exp1 is not int[]");
             }
-        /**
-         * exp2 is not 'int'
-         */
+        //  exp2 is not 'int'
         if (!typeVar2.getType().equals("UnknownType"))
             if (!typeVar2.getType().equals("int")) {
                 ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
                         "exp1[exp2] : exp2 is not int");
             }
+        //set return type to int
         if (typeVar1.getType().equals("int[]")
                 && typeVar2.getType().equals("int"))
             argu.setType("int");
+        _ret = list+"["+index+"]";
         return _ret;
     }
 
     @Override
     public String visit(ArrayLength n, MType argu) {
-        MVar typeVar1= new MVar("UnknowExp",
+        MVar typeVar1= new MVar("UnknowPrimaryExp",
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f0.accept(this, typeVar1);
+        String _ret = n.f0.accept(this, typeVar1);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
-        //exp.length's exp is not 'int'
+        //exp.length's exp is not 'int[]'
         if (!typeVar1.getType().equals("UnknownType"))
             if (!typeVar1.getType().equals("int[]")) {
                 ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
@@ -575,26 +566,24 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
             }
         if (typeVar1.getType().equals("int[]"))
             argu.setType("int");
-        return null;
+        return _ret;
     }
 
     @Override
     public String visit(MessageSend n, MType argu) {
+        String _ret = null;
         MVar typeVar1= new MVar("UnknowClass",
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f0.accept(this, typeVar1);
+        String strClass = n.f0.accept(this, typeVar1);
 
         MMethod method = null;
-
-        /**
-         * exp.method()'s exp is not class
-         */
+        //  exp.method()'s exp is not class
         if (!typeVar1.getType().equals("UnknownType"))
             if (!(typeVar1.isClassType())) {
                 ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
-                        "exp.method : exp is not class");
+                        "exp.method : exp is not class type");
             }
             else {
 
@@ -606,7 +595,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                  */
                 if (classObj == null) {
                     ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
-                            "exp.method : exp is not a" +
+                            "exp.method : exp is not a " +
                                     "declared class");
                 }
                 else {
@@ -634,20 +623,17 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,n.f1.beginLine,n.f1.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        n.f2.accept(this, typeVar2);
+        String strMethod = n.f2.accept(this, typeVar2);
 
         n.f3.accept(this, argu);
 
         ParamType paramList = new ParamType(
                 argu.getMethodName(), argu,
                 n.f3.beginLine,n.f3.beginColumn);
-
-        n.f4.accept(this, paramList);
+        String strParams = n.f4.accept(this, paramList);
 
         if (method != null) {
-            /**
-             * exp.method()'s parameters' type error
-             */
+            //  exp.method()'s parameters' type error
             if (!method.isParamListCompatible(paramList)) {
                 ErrorInfo.addInfo(paramList.getRow(),
                         paramList.getCol(),
@@ -658,10 +644,9 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu.setType(method.getReturnTypeName());
             }
         }
-
         n.f5.accept(this, argu);
-
-        return null;
+        _ret = strClass+"."+strMethod+"("+strParams+")";
+        return _ret;
     }
 
     @Override
@@ -678,8 +663,10 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu.getClassName());
         String _ret = n.f0.accept(this, typeVar1);
 
-        if (argu instanceof ParamType) ((ParamType)argu).insertParam(typeVar1);
-        if (argu instanceof MType) argu.setType(typeVar1.getType());
+        if (argu instanceof ParamType)
+            ((ParamType)argu).insertParam(typeVar1);
+        if (argu instanceof MVar)
+            argu.setType(typeVar1.getType());
 
         return _ret;
     }
@@ -694,7 +681,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         String str1 = n.f1.accept(this, typeVar1);
         if (argu instanceof ParamType)
             ((ParamType)argu).insertParam(typeVar1);
-        if (argu instanceof MType)
+        if (argu instanceof MVar)
             argu.setType(typeVar1.getType());
         return null;
     }
@@ -702,7 +689,6 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
     @Override
     public String visit(AllocationExpression n, MType argu) {
         String _ret = null;
-
         n.f0.accept(this, argu);
 
         MVar typeVar1= new MVar("UnknowIdentifier",
@@ -717,12 +703,10 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         MClass classObj = argu.getClassList().getMClassObj(
                 n.f1.f0.tokenImage);
 
-        /**
-         * new id()'s id no declaration
-         */
+        //  new id()'s id no declaration
         if (classObj == null) {
             ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
-                    "identifier:["+n.f1.f0.tokenImage+"]"+
+                    "identifier:["+n.f1.f0.tokenImage+"] "+
             "has no declaration!");
         }
         else {
@@ -737,21 +721,25 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
-        MVar typeVar1= new MVar("UnknowIdentifier",
+
+        MVar typeVar1= new MVar("UnknowExp",
                 argu,n.f2.beginLine,n.f2.beginColumn,
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        String str3 = n.f3.accept(this, typeVar1);
+        String _ret = n.f3.accept(this, typeVar1);
+
         n.f4.accept(this, argu);
         //new int[exp]'s exp is not 'int'
-        if (!typeVar1.getType().equals("UnknownType"))
+        if (!typeVar1.getType().equals("UnknownType")) {
             if (!typeVar1.getType().equals("int")) {
                 ErrorInfo.addInfo(typeVar1.getRow(),typeVar1.getCol(),
                         "new int[exp] 's exp is not int");
             }
+        }
+        //set argu's type int[] when succeed
         if (typeVar1.getType().equals("int"))
             argu.setType("int[]");
-        return null;
+        return _ret;
     }
 
     @Override
@@ -760,7 +748,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,argu.getRow(),argu.getCol(),
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
-        String str1 = n.f0.accept(this, typeVar1);
+        String _ret = n.f0.accept(this, typeVar1);
 
         if (n.f0.which == 3 && typeVar1.isClassType()) {
 
@@ -784,10 +772,14 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 //get class type
                 typeVar1.setType(idType.getType());
             }
+            if(idType != null && !idType.getInited()){
+                System.out.println("%%%  not inited used of variable");
+            }
         }
+        //set argu's type when the identifier exists
         argu.setType(typeVar1.getType());
-//        argu.setName(str1);
-        return str1;
+        //return identifier's name if possible
+        return _ret;
     }
 
     @Override
@@ -824,14 +816,17 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
 
         MVar idType = null;
 
+        //inside the method field
         if (argu.getMethodName() != null ) {
             idType = argu.getClassList().getMClassObj(
                     argu.getClassName()).getMethodByName(
                     argu.getMethodName()).getVariable(n.f0.tokenImage);
-            System.out.println("      visiting identifier:"+_ret+" of "+
-                    argu.getClassName()+"."+
-            argu.getMethodName());
+//            System.out.println("      visiting identifier:"+_ret+" of "+
+//                    argu.getClassName()+"."+
+//            argu.getMethodName());
         }
+        //out of method field
+        //inside the class field
         if (idType == null)
             idType = argu.getClassList().getMClassObj(
                     argu.getClassName()).getVariable(n.f0.tokenImage);
@@ -839,9 +834,17 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
             argu.setType(idType.getType());
 
         //  identifier uninitialized warning
+        if(idType != null){
+//            idType.setUsed(true);
+        }
+        if(argu.getMethodName() != null &&
+                idType!= null &&
+                !idType.getInited() &&
+                !argu.isParameterByName(_ret)){
+//            System.out.println("%%% Warning Not inited variables "+
+//            _ret+" Row:"+n.f0.beginLine+" Col:"+n.f0.beginColumn);
+        }
 
-        if (idType != null)
-            idType.setUsed(true);
         return _ret;
     }
 

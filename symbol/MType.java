@@ -143,4 +143,10 @@ public class MType {
     public boolean isTypeMatch(MVar left,MVar right){
         return false;
     }
+
+    public boolean isParameterByName(String varName){
+        return false;
+    }
 }
+
+
