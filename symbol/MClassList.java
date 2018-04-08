@@ -40,7 +40,12 @@ public class MClassList  extends MType{
     public boolean insertClass (String className, MClass classObj) {
         if (classList.containsKey(className)) {
             ErrorInfo.addInfo(classObj.getRow(),classObj.getRow(),
-                    "multi declaration of class");
+                    "multi declaration of class :["+
+            className+"]"+"(previous declaration at Row:"+
+                            classList.get(className).getRow()+
+                            " Col:"+classList.get(className).getCol()+
+            ")");
+
             return false;
         }
         classList.put(className, classObj);
@@ -50,7 +55,7 @@ public class MClassList  extends MType{
     public void printAllClass(){
         System.out.printf("\n\nAll Classes:\n\n");
         for(Map.Entry<String,MClass>entry:classList.entrySet()){
-            System.out.println("###########################");
+            System.out.println("#######################################");
             System.out.println(" "+entry.getKey()+" extend "
                     +entry.getValue().getParentClassName());
             entry.getValue().printAllVars(3);
@@ -116,6 +121,24 @@ public class MClassList  extends MType{
                 flag = true;
         }
         return flag;
+    }
+
+    public boolean isSubClass(String subclass,String superclass){
+        while(getMClassObj(subclass) != null &&
+                !subclass.equals(superclass)){
+            subclass = getMClassObj(subclass).getParentClassName();
+        }
+        return getMClassObj(subclass) != null;
+    }
+
+    public boolean isTypeMatch(MVar left,MVar right){
+        if(left.getType().equals(right.getType()))
+            return true;
+        if(!left.isClassType() && right.isClassType())
+            return false;
+        if(isSubClass(right.getType(),left.getType()))
+            return true;
+        return false;
     }
 
 }

@@ -34,8 +34,9 @@ public class MMethod extends MIdentifier{
 
     public boolean insertVariable(String varName,MVar newvar) {
         if(varList.containsKey(varName)){
-            ErrorInfo.addInfo(newvar.getRow(),newvar.getCol(),"multi declaration of"+
-            "variable in method");
+            ErrorInfo.addInfo(newvar.getRow(),newvar.getCol(),"multi declaration of"
+                    + "variable ["+varName+"]in "+getClassName()+"."+
+            getMethodName());
             return false;
         }
         varList.put(newvar.getName(),newvar);
@@ -47,6 +48,8 @@ public class MMethod extends MIdentifier{
 //                newvar.getType()+" "+newvar.getName()+
 //                " to method: "+ getMethodName());
         paramList.add(newvar);
+        //also consider parameters as local variables of the function
+        varList.put(newvar.getName(),newvar);
     }
 
     public void printAll(int spaces){
@@ -72,21 +75,16 @@ public class MMethod extends MIdentifier{
         System.out.println("");
     }
 
-    public void printParams(int spaces){
-        for(int i=0;i<spaces;i++){
-            System.out.printf(" ");
-        }
-        System.out.printf("params:\n");
-        for(int i=0;i<spaces;i++){
-            System.out.printf(" ");
-        }
-        paramList.forEach((value) -> System.out.printf("%s ",
-                value.getName()));
-        System.out.printf("\n");
-    }
-
     public String getMethodName(){
         return getName();
+    }
+
+    public MType getParentClass(){
+        return getParent();
+    }
+
+    public String getClassName(){
+        return getParentClass().getName();
     }
 
     public boolean checkUndefinedClass(MClassList classlist){
@@ -96,7 +94,7 @@ public class MMethod extends MIdentifier{
                 !returnType.equals("int") &&
                 (classlist.getMClassObj(returnType) == null)){
             ErrorInfo.addInfo(getRow(),getCol(),
-                    "return type not defined");
+                    "return type ["+returnType+"] not defined");
             flag = true;
         }
         for(MVar var:varList.values()){
@@ -106,17 +104,6 @@ public class MMethod extends MIdentifier{
                 ErrorInfo.addInfo(var.getRow(),var.getCol(),
                         "local variable type not defined:["+var.getType()+
             "]");
-                flag = true;
-            }
-        }
-        for(int i=0;i<paramList.size();i++){
-            MVar var = paramList.get(i);
-            if(var.isClassType() &&
-                    (classlist.getMClassObj(var.getType()) == null))
-            {
-                ErrorInfo.addInfo(var.getRow(),var.getCol(),
-                        "local variable type not defined:["+var.getType()+
-                "]");
                 flag = true;
             }
         }
@@ -132,6 +119,26 @@ public class MMethod extends MIdentifier{
         for(int i=0;i<paramList.size();i++){
             if(!paramList.get(i).getType().equals(
                     superMethod.paramList.get(i).getType())){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public MVar getVariable(String varName){
+        return varList.get(varName);
+    }
+
+    public MType getClassList(){
+        return getParent().getParent();
+    }
+
+    public boolean isParamListCompatible(ParamType params){
+        if(params.getLength() != paramList.size())
+            return false;
+        for(int i =0;i<paramList.size();i++){
+            if(!getClassList().isTypeMatch(
+                    paramList.get(i),params.getMVar(i))) {
                 return false;
             }
         }

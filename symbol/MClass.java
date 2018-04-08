@@ -18,7 +18,8 @@ public class MClass extends MIdentifier{
 
     public boolean insertMethod(String methodName,MMethod method){
         if(methods.containsKey(methodName)){
-            ErrorInfo.addInfo(method.getRow(),method.getCol(),"multi declaration of method" +
+            ErrorInfo.addInfo(method.getRow(),method.getCol(),
+                    "multi declaration of method " +
                     "of the same name : [" + methodName+"]");
             return false;
         }
@@ -28,8 +29,9 @@ public class MClass extends MIdentifier{
 
     public boolean insertVariable(String variableName,MVar var){
         if(internalVars.containsKey(variableName)){
-            ErrorInfo.addInfo(var.getRow(),var.getCol(),"multi declaration of class" +
-                    "variable");
+            ErrorInfo.addInfo(var.getRow(),var.getCol(),
+                    "multi declaration of class" +
+                    " variable:["+variableName+"]");
             return false;
         }
         internalVars.put(variableName,var);
@@ -82,7 +84,7 @@ public class MClass extends MIdentifier{
             }
         }
         for(MMethod method:methods.values()){
-            if(method.getMethodName().equals("main"))
+            if(method.getName().equals("main"))
                 continue;
             if(method.checkUndefinedClass(classlist))
                 flag = true;
@@ -95,12 +97,12 @@ public class MClass extends MIdentifier{
         for(MMethod method:methods.values()){
             MClass parentClass = classlist.getMClassObj(getParentClassName());
             while(parentClass != null){
-                if(parentClass.methods.containsKey(method.getMethodName())){
-                    MMethod superMethod = parentClass.methods.get(method.getMethodName());
+                if(parentClass.methods.containsKey(method.getName())){
+                    MMethod superMethod = parentClass.methods.get(method.getName());
                     if(!method.canOverride(superMethod)){
                         ErrorInfo.addInfo(method.getRow(),method.getCol(),
                                 "method:["+getName()+"."
-                                        +method.getMethodName()+
+                                        +method.getName()+
                         "] override error");
                         flag = true;
                     }
@@ -119,6 +121,29 @@ public class MClass extends MIdentifier{
 
     public void setParentClassName(String _extendClassName){
         extendClassName = _extendClassName;
+    }
+
+    public MMethod getMethodByName(String methodName){
+        if(methodName == null){
+            return null;
+        }
+        return methods.get(methodName);
+    }
+
+    public String getMethodName(){
+        return null;
+    }
+
+    public String getClassName(){
+        return getName();
+    }
+
+    public MVar getVariable(String varName){
+        return internalVars.get(varName);
+    }
+
+    public MType getClassList(){
+        return getParent();
     }
 
 }

@@ -14,7 +14,6 @@ public class MType {
     private int col;
     private MType parent;
     private String parentName;
-    private String className;
 
     public MType() {
         parent = null;
@@ -22,12 +21,7 @@ public class MType {
     }
 
     public MType(int i){
-        if (i == 3) {
-            identifierAsRet = true;
-        }
-        else {
-            identifierAsRet = false;
-        }
+        identifierAsRet = i == 3;
     }
 
     public void setType(String _type) {
@@ -38,6 +32,7 @@ public class MType {
         return type;
     }
 
+    //whether is a return type of a method
     public boolean isReturnClass(){return identifierAsRet;}
 
     public void setKind(int _kind){
@@ -93,10 +88,11 @@ public class MType {
         return false;
     }
 
-    public void printAllClass(){return;}
+    public void printAllClass(){
 
-    public boolean insertVariable(String varName,
-                                  MVar var) {
+    }
+
+    public boolean insertVariable(String varName, MVar var) {
         return false;
     }
 
@@ -105,27 +101,46 @@ public class MType {
     }
 
     public void addParam(MVar newvar){
-        return;
-    }
 
-    public void setClassName(String _className){
-        className = _className;
-    }
-
-    public String getClassName() {
-        return className;
     }
 
     public String getMethodName() {
-        return "";
+        return null;
+    }
+
+    public String getClassName(){
+        return null;
+    }
+
+    public MType getParentClass(){
+        return null;
     }
 
     public String getReturnTypeName(){
-        return "";
+        return null;
     }
 
     public boolean isClassType(){
-        if(type.equals("Class"))return true;
+        return type.equals("Class");
+    }
+
+    public MMethod getMethodByName(String mName){
+        return null;
+    }
+
+    public MClass getMClassObj(String className){
+        return null;
+    }
+
+    public MVar getVariable(String varName){
+        return null;
+    }
+
+    public MType getClassList(){
+        return null;
+    }
+
+    public boolean isTypeMatch(MVar left,MVar right){
         return false;
     }
 }

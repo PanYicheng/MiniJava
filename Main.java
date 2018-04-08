@@ -17,7 +17,7 @@ public class Main{
         try{
 //            InputStream in = new FileInputStream(args[0]);
             InputStream in = new FileInputStream(
-                    "./program/10.java");
+                    "error.txt");
             Node root = new MiniJavaParser(in).Goal();
             MType allClassList = null;
             System.out.println("---0.start building symbol table");
@@ -37,15 +37,18 @@ public class Main{
 
             System.out.println("---2.second time type check");
 
+            TypeCheckVisitor typecheck = new TypeCheckVisitor();
+            root.accept(typecheck,allClassList);
 
+            System.out.println("---2.end");
 
 
 //            root.accept(new TypeCheckVisitor(),allClassList);
             if(ErrorInfo.getSize() == 0){
-                System.out.println("Program type checked successfully");
+                System.out.println("$$$  Program type checked successfully");
             }
             else{
-                System.out.println("Type error");
+                System.out.println("$$$  Type error");
             }
             System.out.println("---Print All Error Info:");
             ErrorInfo.printAll();

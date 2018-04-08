@@ -2,11 +2,9 @@ package symbol;
 
 public class MIdentifier extends MType{
 
-
-
     public MIdentifier(){
         setType("identifier");
-        setName("");
+        setName("none");
         setRow(-1);
         setCol(-1);
         setParent(null);
