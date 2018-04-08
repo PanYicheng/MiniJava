@@ -147,6 +147,10 @@ public class MType {
     public boolean isParameterByName(String varName){
         return false;
     }
+
+    public boolean getUsed(){
+        return false;
+    }
 }
 
 

@@ -17,7 +17,7 @@ public class Main{
         try{
 //            InputStream in = new FileInputStream(args[0]);
             InputStream in = new FileInputStream(
-                    "program/1.java");
+                    "program/TreeVisitor-error.java");
             Node root = new MiniJavaParser(in).Goal();
             MType allClassList = null;
             System.out.println("---0.start building symbol table");

@@ -15,8 +15,8 @@ class B extends A{
 class Start{
     public int start(){
         A a;
+        B b;       
         a = new B();
-        B b;
         b = new A();
         return 0;
     }

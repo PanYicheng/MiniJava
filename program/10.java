@@ -11,7 +11,7 @@ class A{
 }
 
 class B extends A{
-    public int test(int a){
-        return a+1;
+    public int test(){
+        return 1;
     }
 }

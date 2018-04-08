@@ -84,7 +84,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         _ret = n.f10.accept(this, retVar);
         // return type error
         if (!method.getReturnTypeName().equals(retVar.getType())) {
-            ErrorInfo.addInfo(n.f9.beginColumn,n.f9.beginColumn,
+            ErrorInfo.addInfo(n.f9.beginLine,n.f9.beginColumn,
                     "return(type: "+retVar.getType()+")"+
             "expecting return (type:"+method.getReturnTypeName()+")");
         }
@@ -107,7 +107,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         if (id == null)
             id = argu.getParentClass().getVariable(n.f0.f0.tokenImage);
         if (id == null) {
-            ErrorInfo.addInfo(n.f0.f0.beginColumn,n.f0.f0.beginColumn,
+            ErrorInfo.addInfo(n.f0.f0.beginLine,n.f0.f0.beginColumn,
                     "identifier:["+n.f0.f0.tokenImage+"]"
             +"of "+argu.getParent().getName()+"."+argu.getMethodName()+
             " not declared");
@@ -628,7 +628,7 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         n.f3.accept(this, argu);
 
         ParamType paramList = new ParamType(
-                argu.getMethodName(), argu,
+                argu.getMethodName(),argu.getClassName(), argu,
                 n.f3.beginLine,n.f3.beginColumn);
         String strParams = n.f4.accept(this, paramList);
 
@@ -748,7 +748,10 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
                 argu,argu.getRow(),argu.getCol(),
                 "UnknownType", argu.getMethodName(),
                 argu.getClassName());
+        typeVar1.setUsed(true);
         String _ret = n.f0.accept(this, typeVar1);
+        //use accept return value to pass the identifier 's real name
+        typeVar1.setName(_ret);
 
         if (n.f0.which == 3 && typeVar1.isClassType()) {
 
@@ -771,11 +774,33 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
             if(idType != null){
                 //get class type
                 typeVar1.setType(idType.getType());
-            }
-            if(idType != null && !idType.getInited()){
-                System.out.println("%%%  not inited used of variable");
+                //set this MVar is being used for future detecting
+                //uninited variables using
+                idType.setUsed(true);
             }
         }
+        if(n.f0.which == 3 && !typeVar1.isClassType()){
+            MVar idType = null;
+
+            //  identifier no declaration
+            if (argu.getMethodName() != null) {
+                idType = argu.getClassList().getMClassObj(
+                        argu.getClassName()).getMethodByName(
+                        argu.getMethodName()).getVariable(
+                        typeVar1.getName());
+            }
+            if (idType == null)
+                idType = argu.getClassList().getMClassObj(
+                        argu.getClassName()).getVariable(typeVar1.getName());
+            if(idType != null){
+                //get class type
+                typeVar1.setType(idType.getType());
+                //set this MVar is being used for future detecting
+                //uninited variables using
+                idType.setUsed(true);
+            }
+        }
+
         //set argu's type when the identifier exists
         argu.setType(typeVar1.getType());
         //return identifier's name if possible
@@ -830,19 +855,22 @@ public class TypeCheckVisitor extends GJDepthFirst<String,MType>{
         if (idType == null)
             idType = argu.getClassList().getMClassObj(
                     argu.getClassName()).getVariable(n.f0.tokenImage);
-        if (idType != null)
+        if (idType != null){
             argu.setType(idType.getType());
-
-        //  identifier uninitialized warning
-        if(idType != null){
-//            idType.setUsed(true);
+            if(argu.getUsed()){
+                idType.setUsed(true);
+            }
         }
+
+
+
         if(argu.getMethodName() != null &&
                 idType!= null &&
                 !idType.getInited() &&
-                !argu.isParameterByName(_ret)){
-//            System.out.println("%%% Warning Not inited variables "+
-//            _ret+" Row:"+n.f0.beginLine+" Col:"+n.f0.beginColumn);
+                !argu.isParameterByName(_ret) &&
+                idType.getUsed()){
+            System.out.println("%%% Warning Not inited variables "+
+            _ret+" Row:"+n.f0.beginLine+" Col:"+n.f0.beginColumn);
         }
 
         return _ret;

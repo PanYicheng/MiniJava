@@ -16,7 +16,7 @@ public class MVar extends MIdentifier{
         methodName = _methodName;
         className = _className;
         //always keep parent is a method or a class
-        if(_parent instanceof MVar){
+        if((_parent instanceof MVar) || (_parent instanceof ParamType)){
             setParent(_parent.getParent());
         }
     }
@@ -31,9 +31,10 @@ public class MVar extends MIdentifier{
         methodName = _methodName;
         className = _className;
         //always keep parent is a method or a class
-        if(_parent instanceof MVar){
+        if((_parent instanceof MVar) || (_parent instanceof ParamType)){
             setParent(_parent.getParent());
         }
+
     }
 
     public String getMethodName(){
@@ -57,8 +58,8 @@ public class MVar extends MIdentifier{
     }
 
     public void setInited(int _inited){
-        System.out.println("Change Inited Status of Variables "+getName()
-                +" "+String.valueOf(_inited));
+//        System.out.println("Change Inited Status of Variables "+getName()
+//                +" "+String.valueOf(_inited));
         inited = _inited;
     }
 
@@ -77,13 +78,20 @@ public class MVar extends MIdentifier{
         return true;
     }
 
+
     public MType getClassList(){
         MType classlist = getParent().getClassList();
-
         if(classlist != null){
             return classlist;
         }
         System.out.println("exist one variable without parent class");
         return null;
+    }
+
+    @Override
+    public boolean isParameterByName(String varName) {
+        return getClassList().getMClassObj(getClassName())
+                .getMethodByName(getMethodName())
+                .isParameterByName(varName);
     }
 }

@@ -124,10 +124,12 @@ public class MClass extends MIdentifier{
     }
 
     public MMethod getMethodByName(String methodName){
-        if(methodName == null){
-            return null;
-        }
-        return methods.get(methodName);
+        if(methods.get(methodName)!=null)
+            return methods.get(methodName);
+        if(getClassList().getMClassObj(extendClassName)!=null)
+            return getClassList().getMClassObj(extendClassName)
+            .getMethodByName(methodName);
+        return null;
     }
 
     public String getMethodName(){
@@ -139,7 +141,13 @@ public class MClass extends MIdentifier{
     }
 
     public MVar getVariable(String varName){
-        return internalVars.get(varName);
+        if(internalVars.get(varName) != null)
+            return internalVars.get(varName);
+        if(getClassList().getMClassObj(extendClassName)!= null){
+            return getClassList().getMClassObj(extendClassName)
+                    .getVariable(varName);
+        }
+        return null;
     }
 
     public MType getClassList(){

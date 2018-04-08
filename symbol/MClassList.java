@@ -79,13 +79,17 @@ public class MClassList  extends MType{
                 inheritanceClass.add(tmp.getName());
                 if (checkedClasses.containsKey(tmp.getName()) &&
                         checkedClasses.get(tmp.getName()).equals(now)) {
-                    ErrorInfo.addInfo(myclass.getRow(),myclass.getCol(),
-                            "inheritance loop class:"+myclass.getName());
+
+                    String strOfClass = "";
                     System.out.printf("       Extends class:");
                     for (int i = 0; i < inheritanceClass.size(); i++) {
                         System.out.printf(inheritanceClass.get(i)+" ");
+                        strOfClass = strOfClass + " "
+                                +inheritanceClass.get(i);
                     }
                     System.out.println("");
+                    ErrorInfo.addInfo(myclass.getRow(),myclass.getCol(),
+                            "inheritance loop class:"+strOfClass);
                     return true;
                 }
                 checkedClasses.put(tmp.getName(), now);

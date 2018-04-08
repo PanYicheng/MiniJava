@@ -10,11 +10,14 @@ import java.util.HashMap;
  * @Modified By:
  */
 public class ParamType extends MType {
+    private String methodname;
+    private String classname;
     private ArrayList<MVar> params;
 
-    public ParamType(String _method,MType _parent,int row,int col){
+    public ParamType(String _method,String _classname,MType _parent,int row,int col){
         params = new ArrayList<>();
-        setName(_method);
+        methodname = _method;
+        classname = _classname;
         setParent(_parent);
         setRow(row);
         setCol(col);
@@ -30,5 +33,17 @@ public class ParamType extends MType {
 
     public MVar getMVar(int i){
         return params.get(i);
+    }
+
+    public MType getClassList(){
+        return getParent().getClassList();
+    }
+
+    public String getMethodName(){
+        return methodname;
+    }
+
+    public String getClassName(){
+        return classname;
     }
 }
